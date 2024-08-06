@@ -6,11 +6,14 @@ import numpy as np  # specialy for NaN
 import sys  # for command line arguments
 import getopt  # for checking command line arguments
 import datetime  # for naming the output file
+import logging
+
 
 # for interactive mode
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
 from InquirerPy.separator import Separator
+from pathlib import Path
 
 import zenodo_downloader as zd
 from InquirerPy.validator import PathValidator
@@ -315,58 +318,58 @@ if __name__ == "__main__":
         ##########################            
           
         elif user_option == "LOTUS to MINEs (save LOTUS file as a MINEs)":
-            
-            # Function to add an index number if there are multiple SMILES for the same ID
-            def apply_index(row):
-                smiles_list = row['smiles']
-                id = row['id']
-                if len(smiles_list) > 1:
-                    return [(id + f"_id{i+1}", smiles) for i, smiles in enumerate(smiles_list)]
-                else:
-                    return [(id, smiles_list[0])]
-            
-            # get the filepath for sampling (theoreticaly we can sample from diffrent sources for one toydataset)
+
+            # Get the filepath for sampling (theoretically we can sample from different sources for one toydataset)
             file_to_sample = inquirer.filepath(
                 message="Enter the filepath to sample from:",
-                validate=PathValidator(is_file=True, message="Input is not a file"),
-                # only_directories=True,
-                ).execute()
+                validate=lambda path: Path(path).is_file(),
+            ).execute()
 
-            # load the dataset (can load *.csv, *.csv.gz...)
+            # Load the dataset using the existing read_LOTUS_dataset function
             df = read_LOTUS_dataset(file_to_sample)
 
-            # give a existing file name to append it or give a new name to create a new file
+            # Get the list of columns from the DataFrame
+            columns = df.columns
+
+            # Choose the column names for ID and SMILES interactively
+            id_column = inquirer.select(
+                message="Select the column name for the ID:",
+                choices=columns,
+                default="structure_inchikey",
+            ).execute()
+
+            smiles_column = inquirer.select(
+                message="Select the column name for the SMILES:",
+                choices=columns,
+                default="structure_smiles",
+            ).execute()
+
+            # Give an existing file name to append it or give a new name to create a new file
             output_path_file = inquirer.filepath(
                 message="Enter the output file name or existing filename to append:",
-                # validate=PathValidator(is_file=False, message="Input is not a file"),
-                ).execute()
+            ).execute()
 
             df = df.select(
                 [
-                "structure_wikidata",
-                "structure_smiles",
+                    id_column,
+                    smiles_column,
                 ]
             ).rename(
                 {
-                "structure_wikidata": "id",
-                "structure_smiles": "smiles"
+                    id_column: "id",
+                    smiles_column: "smiles"
                 }
             ).unique()
 
-            # Group by the 'id' column and create a new DataFrame with numbered IDs only for duplicates
-            grouped_df = df.group_by('id').agg(pl.col('smiles'))
+            # Find duplicates in the 'id' column
+            duplicates = df.group_by("id").count().filter(pl.col("count") > 1)
 
-            # Apply the function to each group and flatten the list of lists into a single list of tuples
-            indexed_smiles = [entry for row in grouped_df.to_dicts() for entry in apply_index(row)]
-
-            # Convert the list of tuples back to a Polars DataFrame
-            indexed_df = pl.DataFrame(indexed_smiles, schema=["id", "smiles"])
-
-            # Filter rows where the 'id' column contains the substring 'saying'
-            filtered_df = indexed_df.filter(pl.col('id').str.contains('_id'))
-
-            # Print the filtered DataFrame
-            print(f'IDs to rename: {len(filtered_df)}\n[because of different SMILES with same wikidatalink.]')
+            # Print the duplicate IDs
+            if not duplicates.is_empty():
+                print(f'Duplicate IDs found:\n{duplicates}')
+            else:
+                print("No duplicate IDs found.")
 
             # Write the transformed DataFrame to a new CSV file
-            indexed_df.write_csv(output_path_file)
+            df.write_csv(output_path_file)
+

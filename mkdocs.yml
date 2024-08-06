@@ -1,18 +1,18 @@
-site_name: Dataset Extractor for LOTUS
-site_description: "Python script to extract data from the LOTUS Database"
-site_url: https://commons-research.github.io/dataset-extractor-lotus/
-site_author: Pascal Amrein
-repo_url: https://github.com/commons-research/dataset-extractor-lotus
-repo_name: GitHub
+site_name: Dataset Extractor for LOTUS  #websitename (name of project) 
+site_description: "Python script to extract data from the LOTUS Database" #description
+site_url: https://commons-research.github.io/dataset-extractor-lotus/ #website to mkdocs (will be deployd after running 'mkdocs gh-deploy')
+site_author: <your-name> #your name
+repo_url: https://github.com/commons-research/dataset-extractor-lotus #Github repository
+repo_name: GitHub - Dataset Extractor for LOTUS #name of repository
 
-nav:
+nav: #links to the documentation files in the "/docs" folder.
   - Home: index.md
   - About: about.md
-not_in_nav:
-theme: readthedocs
+not_in_nav: #files, which shouldn't be published with mkdocs, but still in the repo.
+theme: readthedocs #theme
 language: en
 
-theme:
+theme: #advanced changes
   name: material
   features:
     - navigation.tabs
@@ -41,5 +41,5 @@ theme:
 
 
 copyright: |
-  &copy; 2024 <a href="https://github.com/pamrein"  target="_blank" rel="noopener">Pascal Amrein</a>
+  &copy; 2024 <a href="https://github.com/pamrein"  target="_blank" rel="noopener"> P. Amrein </a>
 
