@@ -1,0 +1,45 @@
+site_name: Dataset Extractor for LOTUS
+site_description: "Python script to extract data from the LOTUS Database"
+site_url: https://commons-research.github.io/dataset-extractor-lotus/
+site_author: Pascal Amrein
+repo_url: https://github.com/commons-research/dataset-extractor-lotus
+repo_name: GitHub
+
+nav:
+  - Home: index.md
+  - About: about.md
+not_in_nav:
+theme: readthedocs
+language: en
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.annotation
+    - content.code.copy
+  language: en
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/toggle-switch-off-outline 
+        name: Switch to dark mode
+      primary: teal
+      accent: purple 
+    - scheme: slate 
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode    
+      primary: teal
+      accent: lime
+
+
+copyright: |
+  &copy; 2024 <a href="https://github.com/pamrein"  target="_blank" rel="noopener">Pascal Amrein</a>
+
