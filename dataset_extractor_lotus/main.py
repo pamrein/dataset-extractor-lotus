@@ -360,15 +360,22 @@ if __name__ == "__main__":
                     smiles_column: "smiles"
                 }
             ).unique()
+            #).unique(subset=["smiles"])
 
-            # Find duplicates in the 'id' column
-            duplicates = df.group_by("id").count().filter(pl.col("count") > 1)
+            # Find duplicates in the columns
+            duplicates_id = df.group_by("id").count().filter(pl.col("count") > 1)
+            duplicates_smiles = df.group_by("smiles").count().filter(pl.col("count") > 1)
+
+            # info about dataframe
+            print(f"""--- Uniqueness of dataframe ---\nall columns: {df.unique().shape[1]}\nid: {df.unique(subset="id").shape[0]}\nsmiles: {df.unique(subset="smiles").shape[0]}""")
 
             # Print the duplicate IDs
-            if not duplicates.is_empty():
-                print(f'Duplicate IDs found:\n{duplicates}')
-            else:
-                print("No duplicate IDs found.")
+            if not duplicates_id.is_empty():
+                print(f'Duplicate IDs found:\n{duplicates_id}')
+
+            # Print the duplicate SMILES
+            if not duplicates_smiles.is_empty():
+                print(f'Duplicate SMILES found:\n{duplicates_smiles}')
 
             # Write the transformed DataFrame to a new CSV file
             df.write_csv(output_path_file)
