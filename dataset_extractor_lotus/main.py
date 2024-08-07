@@ -18,6 +18,10 @@ from pathlib import Path
 import zenodo_downloader as zd
 from InquirerPy.validator import PathValidator
 
+# change the configsetting, to see the full tables
+pl.Config.set_tbl_rows(200)
+pl.Config(fmt_str_lengths=550)
+
 def read_LOTUS_dataset(file_to_sample):
     df = pl.read_csv(
         file_to_sample,
